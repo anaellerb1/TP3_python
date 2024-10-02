@@ -4,53 +4,46 @@ TP3 : Pendu
 Auteur : Anaëlle ROBIN
 Date : 01/10/2024
 
-TODO:
-
 """
-import random as r
-import Fonctions_utiles as f #NE PAS METTRE .py SINON NE MARCHE PAS
 
+import random as r
+import tkinter as t
+import Fonctions_utiles as f  # NE PAS METTRE .py SINON NE MARCHE PAS
+
+# Variables globales
 play = True
 score = 0
 parties = 0
-print(">>> Bienvenu dans le jeu du PENDU ! <<<")
+Liste_de_mot = f.lire_txt('Mots.txt')
 
-while play == True :
-    """Initialisations des variables"""
-    Liste_de_mot = f.lire_txt('Mots.txt')
-    solution = Liste_de_mot[r.randint(0,len(Liste_de_mot) -1)].lower()
-    tentatives = 8
-    affichage = solution[0] #extrait la premiere lettre
-    lettres_justes = ""
-    lettres_trouvees = ""
-    for lettre in range(len(solution)-1) :
-        affichage += " _"
-   
-    """Déroulement du jeu"""
-    while tentatives != 0 :
-        print(f"Mot à deviner :  {affichage}")
-        lettre_joueur = str(input("Veuillez rentrer votre lettre : ")).lower()
-        if lettre_joueur in lettres_trouvees:
-            print(f"La lettre '{lettre_joueur}' à déjà été donnée. \nListe des lettres déjà essayées : {lettres_trouvees}")
-        else :
-            lettres_trouvees += lettre_joueur + " "
-            if lettre_joueur in solution :
-                print("-> Bien joué !")
-                lettres_justes += lettre_joueur 
-                affichage = f.afficher_mot(solution,lettres_justes)
-            else :
-                tentatives -= 1
-                print(f"-> Raté ! Il vous reste {tentatives} tentatives.")
-                if tentatives == 0:
-                    print(f">>> Vous avez perdu ! Le mot était '{solution}. <<<")
-        if "_" not in affichage :
-            print(f">>> Félicitations ! Vous avez deviné le mot : {solution} <<<")
-            break
-    if tentatives > score:
-        score = tentatives
-    parties +=1
-    print(f"Votre score : {score}")
-    play = f.ask_rejouer()
+# Interface Tkinter
+fenetre = t.Tk()
+fenetre.title("Jeu du pendu by Anaëlle")
 
-print(f"Votre meilleur score est de {score} pour {parties} parties. ") 
-print("*** FIN DU JEU ***")
+# Label 
+label_mot = t.Label(fenetre, text="", font=("Helvetica", 18))
+label_mot.pack(pady=20)
+
+entree_lettre = t.Entry(fenetre)
+entree_lettre.pack()
+
+label_tentatives = t.Label(fenetre, text=f"Tentatives restantes : 8", font=("Helvetica", 12))
+label_tentatives.pack(pady=10)
+
+label_info = t.Label(fenetre, text="", font=("Helvetica", 12))
+label_info.pack(pady=10)
+
+label_score = t.Label(fenetre, text=f"Le score est de {score}", font=("Helvetica", 12))
+label_score.pack(pady=10)
+
+# Boutons
+bouton_proposer = t.Button(fenetre, text="Proposer", command=lambda: f.proposer_lettre(label_score, parties, entree_lettre, label_info, score, label_mot, label_tentatives))
+bouton_proposer.pack(side="left", padx=20)
+
+bouton_exit = t.Button(fenetre, text="Quitter", command=fenetre.quit)
+bouton_exit.pack(side="right", padx=20)
+
+
+f.initialiser_partie(Liste_de_mot, label_mot, label_tentatives, entree_lettre, label_info, bouton_proposer)
+
+fenetre.mainloop()
